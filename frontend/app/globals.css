@@ -128,3 +128,11 @@
     @apply font-sans;
   }
 }
+
+@keyframes scan {
+  0%, 100% { top: 12px; opacity: 0; }
+  10% { opacity: 1; }
+  50% { top: calc(100% - 12px); opacity: 1; }
+  90% { opacity: 1; }
+}
+.animate-scan { animation: scan 2.5s ease-in-out infinite; }
