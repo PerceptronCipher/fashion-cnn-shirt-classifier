@@ -10,5 +10,5 @@ def preprocess_image(path):
     return array
 
 if __name__ == "__main__":
-    result = preprocess_image("your_photo.jpg")
+    result = preprocess_image("bag.jpg")
     print(result.shape, result.min(), result.max())
