@@ -1,14 +1,51 @@
-from fastapi import FastAPI, UploadFile, File
+import io
+from pathlib import Path
+
+import numpy as np
+import tensorflow as tf
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from PIL import UnidentifiedImageError
+
+from preprocessing import preprocess_image
+
+CLASS_NAMES = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
+               "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
+
+# Loaded once at startup, not per request
+MODEL_PATH = Path(__file__).parent / "fashion_mnist_cnn.keras"
+model = tf.keras.models.load_model(MODEL_PATH)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 def root():
     return {"status": "ok"}
 
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     contents = await file.read()
-    # TODO: preprocess `contents` and run through the trained model
-    return {"label": "placeholder", "confidence": 0.0}
+    try:
+        batch = preprocess_image(io.BytesIO(contents))
+    except UnidentifiedImageError:
+        raise HTTPException(status_code=400, detail="File is not a valid image")
 
+    probs = model.predict(batch, verbose=0)[0]
+    top3 = np.argsort(probs)[::-1][:3]
+    predictions = [
+        {"label": CLASS_NAMES[i], "confidence": float(probs[i])} for i in top3
+    ]
+    return {
+        "label": predictions[0]["label"],
+        "confidence": predictions[0]["confidence"],
+        "top3": predictions,
+    }
