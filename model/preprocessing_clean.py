@@ -19,7 +19,8 @@ def preprocess_clean(source):
     cut = cut.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
     black = Image.new("RGBA", cut.size, (0, 0, 0, 255))
     flat = Image.alpha_composite(black, cut).convert("L")
-    side = max(flat.size)                           # pad to a centred square
+    flat = ImageOps.autocontrast(flat)
+    side = max(flat.size)                           
     square = Image.new("L", (side, side), 0)
     square.paste(flat, ((side - flat.width) // 2, (side - flat.height) // 2))
     square = square.resize((28, 28))

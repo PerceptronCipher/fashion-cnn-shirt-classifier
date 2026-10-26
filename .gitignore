@@ -4,3 +4,6 @@ __pycache__/
 .DS_Store
 .env
 .env.local
+model/my_photos/
+model/my_photos_flat/
+model/debug/

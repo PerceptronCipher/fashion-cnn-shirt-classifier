@@ -1,25 +1,38 @@
-# Fashion MNIST Shirt Classifier: what a 90% model does on real photos
+# Fashion MNIST Shirt Classifier: what happens when a 90% model meets real photos
 
 Built by **Adeyemi Ibrahim Boluwatife** (PerceptronCipher / DataCypher), AI engineer.
 
-I trained a CNN that scores about 90% on Fashion MNIST, then pointed a phone camera at real clothes to see whether that number means anything outside the dataset. This repo is the model, the API, and the camera app used to test it.
+I trained a CNN that scores about 90% on the Fashion MNIST benchmark, then tested it on photos of my own clothes. It got 18% of them right.
+
+## What I measured
+
+| Test set | Plain preprocessing | With background removal |
+|---|---|---|
+| Fashion MNIST test set (10,000 images) | 90.4% | n/a |
+| My casual phone photos (22) | 18.2% (4/22) | 36.4% (8/22) |
+| My flat, dataset-style photos (7) | 28.6% (2/7) | 42.9% (3/7) |
+
+![What the model trains on (top) vs what my photos look like after preprocessing (bottom)](docs/comparison.png)
 
 ## What I found
 
-The benchmark images are small, centred, light-on-black clothing. Real photos are none of those. On my first real test (a mannequin in a dark jacket on a dark background):
+- **Without background removal, the model collapsed onto two answers.** 21 of my 22 photos came back as "Bag" or "Shirt". Real backgrounds fill the 28x28 frame with a bright blob, which is closest to those two classes. The "Shirt 3/4" I first saw was the model defaulting, not skill.
+- **Cutting the item out and placing it on black doubled accuracy** (18% to 36%) by making a photo look more like the training data.
+- **Pose isn't the main explanation.** Flat, dataset-style photos scored 43%, against 36% for casual ones. With 7 photos that's one image of difference, so I can't claim more.
+- **Boosting contrast did nothing.** Same predictions before and after.
 
-| Preprocessing | Top 3 predictions |
-|---|---|
-| Grayscale, resize to 28x28 | Shirt 64.8%, T-shirt/top 34.7%, Pullover 0.4% |
-| Same, with colours inverted | Bag 46.2%, T-shirt/top 21.8%, Shirt 17.4% |
+## Limits of this test
 
-Inverting the image, which fixes light backgrounds, turned a decent answer into a wrong one. The right preprocessing depends on the photo, and the model can't tell you that. This is one photo, and I'm building a larger set of my own to measure it properly.
+- 22 casual photos and 7 flat photos, several of the same items. One photo moves the score by 4.5 to 14 points.
+- I chose the preprocessing after seeing the failures on these same photos, so the "with background removal" scores are optimistic.
+- Some labels are debatable: two of my "sandals" are closed shoes, which the dataset's sandal class doesn't cover.
+- One coat photo's cutout failed, so that test is invalid.
 
-## What's in it
+## What's in the repo
 
-- `model/`: the CNN (3 conv layers, about 90.4% test accuracy), training script and preprocessing
-- `backend/`: FastAPI service with one endpoint, `POST /predict`, that returns the top 3 classes
-- `frontend/`: Next.js camera app that sends a photo to the API and shows the result
+- `model/`: CNN training, evaluation scripts, and the background-removal preprocessing
+- `backend/`: FastAPI service with `POST /predict` (top-3 classes). It currently uses the plain preprocessing, not the background removal.
+- `frontend/`: Next.js camera app
 
 ## Run it
 
@@ -34,11 +47,11 @@ echo "NEXT_PUBLIC_API_URL=http://127.0.0.1:8000" > .env.local
 npm install && npm run dev
 ```
 
-Open `http://localhost:3000`. The camera only works on localhost or HTTPS.
+Open `http://localhost:3000` (the camera only works on localhost or HTTPS). To reproduce the photo tests, run `pip install "rembg[cpu]"`, put labelled photos in `model/my_photos/` named like `shirt_01.jpg`, and run `python evaluate_compare.py my_photos` from `model/`.
 
 ## Next
 
-Photo upload, automatic background detection, a test set of my own photos with before/after accuracy, and a public deployment.
+Move background removal into the API, add photo upload, retrain with augmentation on varied backgrounds, and deploy publicly.
 
 ## Author
 
