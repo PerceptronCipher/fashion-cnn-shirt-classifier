@@ -1,6 +1,6 @@
 # Fashion MNIST Shirt Classifier: what happens when a 90% model meets real photos
 
-Built by **Adeyemi Ibrahim Boluwatife** (PerceptronCipher / DataCypher), AI engineer.
+Built by **Adeyemi Ibrahim Boluwatife** (PerceptronCipher), AI/ML engineer.
 
 I trained a CNN that scores about 90% on the Fashion MNIST benchmark, then tested it on photos of my own clothes. It got 18% of them right.
 
