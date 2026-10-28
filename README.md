@@ -31,7 +31,7 @@ I trained a CNN that scores about 90% on the Fashion MNIST benchmark, then teste
 ## What's in the repo
 
 - `model/`: CNN training, evaluation scripts, and the background-removal preprocessing
-- `backend/`: FastAPI service with `POST /predict` (top-3 classes). It currently uses the plain preprocessing, not the background removal.
+- `backend/`: FastAPI service with `POST /predict` (top-3 classes), using the same background-removal preprocessing as the tests above
 - `frontend/`: Next.js camera app
 
 ## Run it
@@ -51,7 +51,7 @@ Open `http://localhost:3000` (the camera only works on localhost or HTTPS). To r
 
 ## Next
 
-Move background removal into the API, add photo upload, retrain with augmentation on varied backgrounds, and deploy publicly.
+Add photo upload, retrain with augmentation on varied backgrounds, and deploy publicly.
 
 ## Author
 
