@@ -4,5 +4,6 @@ python-multipart==0.0.32
 pillow==12.3.0
 numpy==2.5.3
 tensorflow==2.21.0
-keras==3.15.1onnxruntime==1.31.0
+keras==3.15.1
+onnxruntime==1.31.0
 rembg==2.0.86
